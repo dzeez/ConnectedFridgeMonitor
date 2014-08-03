@@ -8,13 +8,20 @@
 #include <RHReliableDatagram.h>
 #include <RH_ASK.h>
 #include <SPI.h>
-
-#include "DHT.h"
 #include <stdlib.h>
 
+#include <OneWire.h>
+#include <DallasTemperature.h>
+// Data wire is plugged into port 2 on the Arduino
+#define ONE_WIRE_BUS A1
+// Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
+OneWire oneWire(ONE_WIRE_BUS);
+// Pass our oneWire reference to Dallas Temperature. 
+DallasTemperature sensors(&oneWire);
+
+#include "DHT.h"
 #define DHTPIN 3
 #define DHTTYPE DHT22
-
 DHT dht(DHTPIN, DHTTYPE);
 
 #define CLIENT_ADDRESS 1
@@ -28,22 +35,31 @@ RHReliableDatagram manager(driver, CLIENT_ADDRESS);
 
 void setup() 
 {
+  //for ds18b20
+  pinMode(A0,OUTPUT);
+  pinMode(A2,OUTPUT);
+  digitalWrite(A0,HIGH);
+  digitalWrite(A2,LOW);
+  
+  /* for DHT sensor
       pinMode(2, OUTPUT);
   digitalWrite(2,HIGH);
   pinMode(4, OUTPUT);
   digitalWrite(4,LOW);
   pinMode(5, OUTPUT);
   digitalWrite(5,LOW);
+  */
   
   pinMode(13, OUTPUT);
-  digitalWrite(13, HIGH);
+  digitalWrite(13, HIGH); //for xmitter
   
   Serial.begin(115200);
   if (!manager.init())
     Serial.println("init failed");
-  else Serial.println("driver initialized");
+  else Serial.println("Transmit. Driver initialized");
   
   dht.begin();
+  sensors.begin();
   delay(1000);
 }
 
@@ -55,9 +71,11 @@ uint8_t buf[RH_ASK_MAX_MESSAGE_LEN];
 void loop()
 {
   Serial.println("Sending to ask_reliable_datagram_server");
-  
+  sensors.requestTemperatures(); // Send the command to get temperatures
   char buffer[10];
-  char *data = dtostrf(dht.readTemperature(true),5,2,buffer);
+  //char *data = dtostrf(dht.readTemperature(true),5,2,buffer);
+  char *data = dtostrf(sensors.getTempFByIndex(0),5,2,buffer);
+  
   Serial.println(data);
   //Serial.println(sizeof(dht.readTemperature(true)));
   //Serial.println(strlen(data));
@@ -84,6 +102,7 @@ void loop()
   }
   else
     Serial.println("sendtoWait failed");
-  delay(2000);
+  //delay(2000);//for dht
+  delay(250); //FIXME: adjust?
 }
 
