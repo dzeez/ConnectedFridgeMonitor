@@ -53,7 +53,7 @@ void setup()
   pinMode(13, OUTPUT);
   digitalWrite(13, HIGH); //for xmitter
   
-  Serial.begin(115200);
+  Serial.begin(9600);
   if (!manager.init())
     Serial.println("init failed");
   else Serial.println("Transmit. Driver initialized");
@@ -70,7 +70,7 @@ uint8_t buf[RH_ASK_MAX_MESSAGE_LEN];
 
 void loop()
 {
-  Serial.println("Sending to ask_reliable_datagram_server");
+  Serial.println(F("Sending to receiver: "));
   sensors.requestTemperatures(); // Send the command to get temperatures
   char buffer[10];
   //char *data = dtostrf(dht.readTemperature(true),5,2,buffer);
@@ -101,7 +101,7 @@ void loop()
     */
   }
   else
-    Serial.println("sendtoWait failed");
+    //Serial.println("sendtoWait failed");
   //delay(2000);//for dht
   delay(250); //FIXME: adjust?
 }

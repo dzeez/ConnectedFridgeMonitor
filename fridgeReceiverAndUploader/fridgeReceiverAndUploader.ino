@@ -17,7 +17,7 @@
 #define SERVER_ADDRESS 2
 
 // Singleton instance of the radio driver
-RH_ASK driver(2000,6,3,2);
+RH_ASK driver(2000,6,3,2); //dsd: customize pin config for "easypins" FIXME
 
 // Class to manage message delivery and receipt, using the driver declared above
 RHReliableDatagram manager(driver, SERVER_ADDRESS);
