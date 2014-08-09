@@ -60,6 +60,7 @@ void setup()
   
   dht.begin();
   sensors.begin();
+  sensors.setResolution(12); // make sure sensor is set for 12-bit resolution
   delay(1000);
 }
 
